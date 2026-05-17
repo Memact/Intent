@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { predictIntent } from '../src/engine.mjs';
+import { predictIntent, scoreRule } from '../src/engine.mjs';
 import { normalizeInput, clampConfidence, confidenceLevel, createSafetyObject, createLowSignalIntent, detectInputSchema, INTENT_SCHEMA_VERSION } from '../src/schema.mjs';
 import { findSensitiveSignals, SENSITIVE_KEYWORDS } from '../src/intent-rules.mjs';
 
@@ -101,7 +101,22 @@ describe('Memact Intent Engine', () => {
   });
 
   it('uses only matched evidence for sequence scoring', () => {
-    const result = predictIntent({
+    const rule = {
+      id: 'intent:test_sequence_scope',
+      label: 'Test sequence scope',
+      category: 'test',
+      baseConfidence: 0.10,
+      signals: {
+        keywords: ['compare'],
+        typeMatches: ['product_page'],
+        categoryMatches: [],
+        urlPatterns: [],
+        domainMatches: []
+      },
+      sequences: [['product_page', 'unmatched_followup']]
+    };
+
+    const activities = normalizeInput({
       activities: [
         {
           id: 'matched_product',
@@ -111,18 +126,18 @@ describe('Memact Intent Engine', () => {
           timestamp: '2026-05-17T10:00:00.000Z'
         },
         {
-          id: 'unrelated_review',
+          id: 'unmatched_followup',
           label: 'Casual unrelated page',
-          type: 'review_page',
+          type: 'unmatched_followup',
           category: 'misc',
           timestamp: '2026-05-17T10:05:00.000Z'
         }
       ]
-    }, { now: '2026-05-17T12:00:00.000Z' });
+    });
 
-    const shopping = result.predicted_intents.find(intent => intent.id === 'intent:shopping_comparison');
-    assert.ok(shopping, 'Expected shopping intent to be present');
-    assert.equal(shopping.confidence_basis.sequence_strength, 0);
+    const score = scoreRule(rule, activities, { now: '2026-05-17T12:00:00.000Z' });
+    assert.ok(score, 'Expected custom test rule to score');
+    assert.equal(score.confidence_basis.sequence_strength, 0);
   });
 
   it('supports deterministic generated_at from now option', () => {

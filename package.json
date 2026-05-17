@@ -2,6 +2,7 @@
   "name": "memact-intent",
   "version": "0.1.0",
   "description": "Permissioned intent prediction from approved digital activity",
+  "license": "LicenseRef-BUSL-1.1-Memact",
   "type": "module",
   "scripts": {
     "intent": "node src/cli.mjs",

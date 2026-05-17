@@ -1,0 +1,49 @@
+{
+  "activities": [
+    {
+      "id": "act_1",
+      "label": "Read documentation page",
+      "type": "documentation_page",
+      "category": "web:research",
+      "timestamp": "2026-05-17T14:00:00.000Z",
+      "url": "https://docs.example.com/introduction",
+      "text": "Read the introduction to the framework documentation"
+    },
+    {
+      "id": "act_2",
+      "label": "Completed tutorial",
+      "type": "tutorial",
+      "category": "web:research",
+      "timestamp": "2026-05-17T14:20:00.000Z",
+      "url": "https://learn.example.com/tutorials/getting-started",
+      "text": "Worked through the getting started tutorial step by step"
+    },
+    {
+      "id": "act_3",
+      "label": "Read research paper",
+      "type": "article",
+      "category": "web:research",
+      "timestamp": "2026-05-17T14:45:00.000Z",
+      "url": "https://papers.example.com/distributed-systems-2026",
+      "text": "Read a research paper on distributed systems architecture"
+    },
+    {
+      "id": "act_4",
+      "label": "Saved notes",
+      "type": "note",
+      "category": "web:research",
+      "timestamp": "2026-05-17T15:00:00.000Z",
+      "url": "https://notes.example.com/distributed-systems",
+      "text": "Saved notes about key concepts from the paper and tutorial"
+    },
+    {
+      "id": "act_5",
+      "label": "Revisited documentation",
+      "type": "documentation_page",
+      "category": "web:research",
+      "timestamp": "2026-05-17T15:10:00.000Z",
+      "url": "https://docs.example.com/advanced-topics",
+      "text": "Referred back to documentation for advanced topic clarification"
+    }
+  ]
+}

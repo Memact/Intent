@@ -1,0 +1,49 @@
+{
+  "activities": [
+    {
+      "id": "act_1",
+      "label": "Opened consent page",
+      "type": "consent_opened",
+      "category": "access:permissions",
+      "timestamp": "2026-05-17T10:00:00.000Z",
+      "url": "https://memact.com/Access/consent",
+      "text": "Opened the consent management page"
+    },
+    {
+      "id": "act_2",
+      "label": "Opened Data Transparency",
+      "type": "data_transparency_opened",
+      "category": "access:permissions",
+      "timestamp": "2026-05-17T10:02:00.000Z",
+      "url": "https://memact.com/Access/data-transparency",
+      "text": "Opened the Data Transparency page to review data usage"
+    },
+    {
+      "id": "act_3",
+      "label": "Viewed scopes",
+      "type": "scopes_viewed",
+      "category": "access:permissions",
+      "timestamp": "2026-05-17T10:05:00.000Z",
+      "url": "https://memact.com/Access/scopes",
+      "text": "Viewed all available permission scopes"
+    },
+    {
+      "id": "act_4",
+      "label": "Changed categories",
+      "type": "categories_changed",
+      "category": "access:permissions",
+      "timestamp": "2026-05-17T10:10:00.000Z",
+      "url": "https://memact.com/Access/categories",
+      "text": "Modified which activity categories are permitted"
+    },
+    {
+      "id": "act_5",
+      "label": "Revoked consent for app",
+      "type": "consent_revoked",
+      "category": "access:permissions",
+      "timestamp": "2026-05-17T10:15:00.000Z",
+      "url": "https://memact.com/Access",
+      "text": "Revoked consent for a previously authorized app"
+    }
+  ]
+}

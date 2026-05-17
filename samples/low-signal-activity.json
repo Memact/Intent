@@ -1,0 +1,40 @@
+{
+  "activities": [
+    {
+      "id": "act_1",
+      "label": "Visited homepage",
+      "type": "page_visit",
+      "category": "general",
+      "timestamp": "2026-05-17T08:00:00.000Z",
+      "url": "https://example.com",
+      "text": "Landed on homepage"
+    },
+    {
+      "id": "act_2",
+      "label": "Clicked random link",
+      "type": "page_visit",
+      "category": "general",
+      "timestamp": "2026-05-17T08:02:00.000Z",
+      "url": "https://example.com/about",
+      "text": "Clicked on a link without clear intent"
+    },
+    {
+      "id": "act_3",
+      "label": "Visited about page",
+      "type": "page_visit",
+      "category": "general",
+      "timestamp": "2026-05-17T08:05:00.000Z",
+      "url": "https://example.com/about/team",
+      "text": "Briefly looked at the team page"
+    },
+    {
+      "id": "act_4",
+      "label": "Brief page view",
+      "type": "page_visit",
+      "category": "general",
+      "timestamp": "2026-05-17T08:07:00.000Z",
+      "url": "https://example.com/blog",
+      "text": "Quick scan of blog listing, no article opened"
+    }
+  ]
+}

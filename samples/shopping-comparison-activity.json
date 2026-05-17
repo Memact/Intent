@@ -1,0 +1,49 @@
+{
+  "activities": [
+    {
+      "id": "act_1",
+      "label": "Viewed product page",
+      "type": "product_page",
+      "category": "web:commerce",
+      "timestamp": "2026-05-17T11:00:00.000Z",
+      "url": "https://store.example.com/product/laptop-x1",
+      "text": "Viewed Laptop X1 product specifications and price"
+    },
+    {
+      "id": "act_2",
+      "label": "Read product reviews",
+      "type": "review_page",
+      "category": "web:commerce",
+      "timestamp": "2026-05-17T11:05:00.000Z",
+      "url": "https://store.example.com/product/laptop-x1/reviews",
+      "text": "Scanned customer reviews for Laptop X1"
+    },
+    {
+      "id": "act_3",
+      "label": "Compared prices",
+      "type": "price_comparison",
+      "category": "web:commerce",
+      "timestamp": "2026-05-17T11:10:00.000Z",
+      "url": "https://store.example.com/compare?models=x1,y2,z3",
+      "text": "Compared prices and specs across three laptop models"
+    },
+    {
+      "id": "act_4",
+      "label": "Added to cart",
+      "type": "cart",
+      "category": "web:commerce",
+      "timestamp": "2026-05-17T11:15:00.000Z",
+      "url": "https://store.example.com/cart",
+      "text": "Added Laptop Y2 to shopping cart"
+    },
+    {
+      "id": "act_5",
+      "label": "Viewed another product page",
+      "type": "product_page",
+      "category": "web:commerce",
+      "timestamp": "2026-05-17T11:20:00.000Z",
+      "url": "https://store.example.com/product/laptop-z3",
+      "text": "Viewed Laptop Z3 as an alternative to previous selection"
+    }
+  ]
+}

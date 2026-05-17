@@ -1,0 +1,58 @@
+{
+  "activities": [
+    {
+      "id": "act_1",
+      "label": "Created app",
+      "type": "app_created",
+      "category": "dev:code",
+      "timestamp": "2026-05-17T09:00:00.000Z",
+      "url": "https://memact.com/Apps",
+      "text": "Created a new app in the developer dashboard"
+    },
+    {
+      "id": "act_2",
+      "label": "Saved permissions",
+      "type": "permissions_saved",
+      "category": "dev:code",
+      "timestamp": "2026-05-17T09:05:00.000Z",
+      "url": "https://memact.com/Access",
+      "text": "Configured and saved app permissions"
+    },
+    {
+      "id": "act_3",
+      "label": "Created API key",
+      "type": "api_key_created",
+      "category": "dev:code",
+      "timestamp": "2026-05-17T09:10:00.000Z",
+      "url": "https://memact.com/Access",
+      "text": "Created app-specific API key for integration"
+    },
+    {
+      "id": "act_4",
+      "label": "Opened Connect tutorial",
+      "type": "connect_tutorial_opened",
+      "category": "dev:code",
+      "timestamp": "2026-05-17T09:15:00.000Z",
+      "url": "https://memact.com/learn",
+      "text": "Started the Connect SDK integration tutorial"
+    },
+    {
+      "id": "act_5",
+      "label": "Tested API key",
+      "type": "api_key_tested",
+      "category": "dev:code",
+      "timestamp": "2026-05-17T09:20:00.000Z",
+      "url": "https://memact.com/Access",
+      "text": "Tested the generated API key with a curl command"
+    },
+    {
+      "id": "act_6",
+      "label": "Viewed API endpoint docs",
+      "type": "api_docs_viewed",
+      "category": "dev:code",
+      "timestamp": "2026-05-17T09:25:00.000Z",
+      "url": "https://memact.com/docs/api",
+      "text": "Viewed API endpoint documentation for integration"
+    }
+  ]
+}

@@ -4,6 +4,10 @@
   "description": "Permissioned intent prediction from approved digital activity",
   "license": "LicenseRef-BUSL-1.1-Memact",
   "type": "module",
+  "exports": {
+    ".": "./src/engine.mjs",
+    "./engine": "./src/engine.mjs"
+  },
   "scripts": {
     "intent": "node src/cli.mjs",
     "sample": "node src/cli.mjs --input samples/dev-integration-activity.json --format report",

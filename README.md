@@ -1,16 +1,24 @@
 # Memact Intent
 
-Evidence-backed user intent prediction from approved digital activity.
+Permissioned intent prediction from approved digital activity.
+
+```text
+Understand what users are trying to do.
+```
 
 ## What it is
 
-Memact Intent is a deterministic, rule-based engine that turns meaningful digital activity into evidence-backed intent predictions. It is part of the [Memact](https://memact.com) infrastructure, sitting between the Inference layer (which produces meaningful activity records) and any application that needs to understand what a user is likely trying to do.
+Memact Intent is a deterministic, rule-based engine that helps apps predict user intent from approved digital activity, without giving them raw access to a user's private data.
 
-Intent predictions are evidence-backed hypotheses, not facts. Every prediction includes:
-- Which rules matched and why
-- Evidence items supporting the prediction
-- Alternative possible intents
-- Safe suggested actions and explicitly blocked actions
+It is part of the Memact infrastructure. It consumes approved activity records from upstream layers and returns evidence-backed intent hypotheses that apps can use safely.
+
+Intent predictions are hypotheses, not facts. Every prediction includes:
+
+- which rules matched and why
+- evidence items supporting the prediction
+- alternative possible intents
+- safe suggested actions
+- blocked actions the app must not take
 
 ## What it is not
 
@@ -23,11 +31,13 @@ Intent predictions are evidence-backed hypotheses, not facts. Every prediction i
 
 ## How it fits into Memact
 
-```
-Capture → Inference → Schema → Memory → Access → Intent (this)
+```text
+Access → Capture → Inference → Schema → Memory → Intent
 ```
 
-Intent consumes records from upstream Memact layers (Capture events, Inference records, Schema packets) or simple activity arrays. It produces structured intent predictions that applications can use to offer helpful suggestions — without guessing user identity or sensitive traits.
+Access decides what an app is allowed to ask for. Capture records approved evidence locally. Inference filters meaningful activity. Schema groups repeated patterns. Memory stores what survives. Intent predicts what the user is likely trying to do from approved evidence.
+
+Intent can consume Capture events, Inference records, Schema packets, Memory-shaped activity, or simple activity arrays. It returns structured intent predictions without guessing user identity or sensitive traits.
 
 ## Install
 
@@ -71,6 +81,8 @@ npm run check
   "generated_at": "2026-05-17T12:00:00.000Z",
   "source": {
     "activity_count": 6,
+    "approved_activity_count": 5,
+    "skipped_sensitive_activity_count": 1,
     "evidence_count": 5,
     "input_schema": "memact.activity_set"
   },
@@ -94,7 +106,7 @@ npm run check
           "source_id": "act_api_key",
           "timestamp": "2026-05-17T10:00:00.000Z",
           "weight": 0.22,
-          "reason": "API key creation is a strong integration signal."
+          "reason": "type: api_key_created; keyword: api"
         }
       ],
       "alternative_intents": [
@@ -128,7 +140,7 @@ npm run check
 - Intent predictions are always hypotheses, never facts.
 - Confidence is capped at 0.95 — the engine never claims certainty.
 - Every prediction includes alternative intents.
-- Sensitive keywords (religion, sexuality, medical, political, financial, mental health) are detected and skipped. The engine notes them in `unresolved_signals` and does not use them for prediction.
+- Sensitive activity is detected, listed in `unresolved_signals`, and excluded from rule matching and scoring.
 - User confirmation is required before acting on any prediction.
 - Raw captures are never exposed in output.
 - Blocked actions list what an app must not do, even at high confidence.
@@ -139,7 +151,7 @@ This engine starts deterministic and rule-based for several reasons:
 
 1. **Auditability** — every prediction can be traced to specific rules and evidence. There is no black box.
 2. **Privacy** — no data leaves the user's machine. No API calls. No prompt injection surface.
-3. **Predictability** — the same input always produces the same output. No drift, no hallucinations.
+3. **Predictability** — the same input can produce the same output when a fixed `now` value is provided.
 4. **Simplicity** — a small focused codebase that is easy to review, test, and extend.
 
 LLM-based intent classification may be added later as an optional extension, but the core engine must always remain deterministic and auditable.
@@ -154,17 +166,17 @@ LLM-based intent classification may be added later as an optional extension, but
 
 ## Project structure
 
-```
+```text
 Intent/
 ├── README.md
 ├── package.json
 ├── src/
 │   ├── cli.mjs          # Command-line interface
-│   ├── engine.mjs        # Core prediction engine
-│   ├── intent-rules.mjs  # Intent rule definitions and sensitive keyword list
-│   ├── schema.mjs        # Data normalization, safety, confidence utilities
-│   └── format.mjs        # Human-readable report formatter
-├── samples/              # Example activity inputs
+│   ├── engine.mjs       # Core prediction engine
+│   ├── intent-rules.mjs # Intent rules and sensitive signal detection
+│   ├── schema.mjs       # Data normalization, safety, confidence utilities
+│   └── format.mjs       # Human-readable report formatter
+├── samples/             # Example activity inputs
 └── test/
-    └── intent.test.mjs   # Test suite (Node.js built-in test runner)
+    └── intent.test.mjs  # Test suite (Node.js built-in test runner)
 ```

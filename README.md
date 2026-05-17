@@ -6,28 +6,13 @@ Permissioned intent prediction from approved digital activity.
 Understand what users are trying to do.
 ```
 
-## What it is
+## Overview
 
-Memact Intent is a deterministic, rule-based engine that helps apps predict user intent from approved digital activity, without giving them raw access to a user's private data.
+Memact Intent is a deterministic, rule-based engine for turning approved digital activity into intent hypotheses.
 
-It is part of the Memact infrastructure. It consumes approved activity records from upstream layers and returns evidence-backed intent hypotheses that apps can use safely.
+Each prediction carries the evidence behind it: matched rules, supporting activity, alternative intents, safe next actions, and blocked actions. Apps get a narrow intent signal instead of raw private data.
 
-Intent predictions are hypotheses, not facts. Every prediction includes:
-
-- which rules matched and why
-- evidence items supporting the prediction
-- alternative possible intents
-- safe suggested actions
-- blocked actions the app must not take
-
-## What it is not
-
-- Not an AI/ML model
-- Not a ChatGPT wrapper
-- Not an LLM-powered intent classifier
-- Not a frontend application
-- Not a recommendation engine
-- Not a surveillance tool
+Intent predictions are hypotheses, not facts. They are meant to guide user-confirmed actions, not replace user choice.
 
 ## How it fits into Memact
 
@@ -35,9 +20,9 @@ Intent predictions are hypotheses, not facts. Every prediction includes:
 Access → Capture → Inference → Schema → Memory → Intent
 ```
 
-Access decides what an app is allowed to ask for. Capture records approved evidence locally. Inference filters meaningful activity. Schema groups repeated patterns. Memory stores what survives. Intent predicts what the user is likely trying to do from approved evidence.
+Access checks app permission, consent, scopes, and categories. Capture records approved evidence locally. Inference keeps meaningful activity. Schema groups repeated patterns. Memory stores what survives. Intent predicts what the user is likely trying to do from approved evidence.
 
-Intent can consume Capture events, Inference records, Schema packets, Memory-shaped activity, or simple activity arrays. It returns structured intent predictions without guessing user identity or sensitive traits.
+Intent can consume Capture events, Inference records, Schema packets, Memory-shaped activity, or simple activity arrays. Sensitive activity is skipped before scoring.
 
 ## Install
 
@@ -138,28 +123,28 @@ npm run check
 ## Safety rules
 
 - Intent predictions are always hypotheses, never facts.
-- Confidence is capped at 0.95 — the engine never claims certainty.
+- Confidence is capped at 0.95.
 - Every prediction includes alternative intents.
 - Sensitive activity is detected, listed in `unresolved_signals`, and excluded from rule matching and scoring.
 - User confirmation is required before acting on any prediction.
 - Raw captures are never exposed in output.
 - Blocked actions list what an app must not do, even at high confidence.
 
-## Why rule-based instead of LLM-based
+## Design choices
 
-This engine starts deterministic and rule-based for several reasons:
+The first version uses deterministic rules because intent infrastructure needs clear evidence trails.
 
-1. **Auditability** — every prediction can be traced to specific rules and evidence. There is no black box.
-2. **Privacy** — no data leaves the user's machine. No API calls. No prompt injection surface.
-3. **Predictability** — the same input can produce the same output when a fixed `now` value is provided.
-4. **Simplicity** — a small focused codebase that is easy to review, test, and extend.
+- **Auditability** — every prediction traces back to rules and evidence.
+- **Privacy** — scoring runs locally without sending activity to external APIs.
+- **Predictability** — the same input can produce the same output when a fixed `now` value is provided.
+- **Small surface area** — the engine stays easy to review, test, and extend.
 
-LLM-based intent classification may be added later as an optional extension, but the core engine must always remain deterministic and auditable.
+Optional model-based scoring can be added later as a secondary signal. The core engine should stay auditable.
 
 ## Future extension points
 
 - Additional intent rules via plugins or configuration
-- Optional LLM-based scoring as a secondary signal
+- Optional model-based scoring as a secondary signal
 - Time-window analysis for session-level intent
 - Cross-session pattern detection
 - User feedback loop for confidence calibration

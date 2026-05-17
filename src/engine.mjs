@@ -69,7 +69,13 @@ function matchRule(rule, activities) {
   return { matches, matchedKeywords };
 }
 
-function calculateScore(rule, activities, matches, matchedKeywords) {
+function resolveNow(options = {}) {
+  if (!options.now) return Date.now();
+  const time = new Date(options.now).getTime();
+  return Number.isNaN(time) ? Date.now() : time;
+}
+
+function calculateScore(rule, activities, matches, matchedKeywords, options = {}) {
   const keywordCount = matchedKeywords.size;
   const totalKeywords = rule.signals.keywords?.length || 1;
   const keywordCoverage = keywordCount / totalKeywords;
@@ -92,28 +98,28 @@ function calculateScore(rule, activities, matches, matchedKeywords) {
   const avgQuality = matches.length > 0 ? totalQuality / matches.length : 0;
   const evidence_strength = 0.25 * avgQuality;
 
-  const allTypes = activities.map(a => a.type).filter(Boolean);
+  const matchedSequenceTypes = matches.map(m => m.activity.type).filter(Boolean);
   let seqMatches = 0;
   for (const seq of (rule.sequences || [])) {
-    if (matchesSequence(seq, allTypes)) {
+    if (matchesSequence(seq, matchedSequenceTypes)) {
       seqMatches++;
     }
   }
   const sequence_strength = 0.15 * (seqMatches / Math.max(rule.sequences?.length || 1, 1));
 
-  const timestamps = activities
-    .map(a => a.timestamp)
+  const now = resolveNow(options);
+  const timestamps = matches
+    .map(m => m.activity.timestamp)
     .filter(Boolean)
     .map(t => new Date(t).getTime())
     .filter(t => !isNaN(t));
   let recency_strength = 0;
   if (timestamps.length > 0) {
-    const now = Date.now();
     const avgAge = timestamps.reduce((sum, t) => sum + (now - t) / (24 * 60 * 60 * 1000), 0) / timestamps.length;
     recency_strength = 0.10 * Math.max(0, 1 - avgAge / 7);
   }
 
-  const categories = new Set(activities.map(a => a.category).filter(Boolean));
+  const categories = new Set(matches.map(m => m.activity.category).filter(Boolean));
   const ambiguity_penalty = categories.size > 2 ? 0.03 * (categories.size - 2) : 0;
 
   const confidence = clampConfidence(
@@ -161,28 +167,39 @@ function buildIntentResult(rule, score, matches) {
   };
 }
 
+function activityKey(activity, index) {
+  return activity.id || `activity:${index}`;
+}
+
+function removeSensitiveActivities(activities, sensitiveSignals) {
+  const sensitiveSourceIds = new Set(sensitiveSignals.map(signal => signal.source_id).filter(Boolean));
+  return activities.filter((activity, index) => !sensitiveSourceIds.has(activityKey(activity, index)));
+}
+
 export function normalizeActivities(input) {
   return normalizeInput(input);
 }
 
 export function scoreRule(rule, activities, options = {}) {
-  const { matches, matchedKeywords } = matchRule(rule, activities);
+  const safeActivities = removeSensitiveActivities(activities, findSensitiveSignals(activities));
+  const { matches, matchedKeywords } = matchRule(rule, safeActivities);
   if (matches.length === 0) return null;
-  return calculateScore(rule, activities, matches, matchedKeywords);
+  return calculateScore(rule, safeActivities, matches, matchedKeywords, options);
 }
 
 export function predictIntent(input, options = {}) {
   const activities = normalizeActivities(input);
   const inputSchema = detectInputSchema(input);
   const sensitiveSignals = findSensitiveSignals(activities);
+  const safeActivities = removeSensitiveActivities(activities, sensitiveSignals);
 
   const scoredIntents = [];
 
   for (const rule of INTENT_RULES) {
-    const { matches, matchedKeywords } = matchRule(rule, activities);
+    const { matches, matchedKeywords } = matchRule(rule, safeActivities);
     if (matches.length === 0) continue;
 
-    const score = calculateScore(rule, activities, matches, matchedKeywords);
+    const score = calculateScore(rule, safeActivities, matches, matchedKeywords, options);
     const intent = buildIntentResult(rule, score, matches);
 
     scoredIntents.push(intent);
@@ -190,23 +207,24 @@ export function predictIntent(input, options = {}) {
 
   scoredIntents.sort((a, b) => b.confidence - a.confidence);
 
-  if (scoredIntents.length === 0 || scoredIntents[0].confidence < 0.25) {
-    scoredIntents.push(
-      createLowSignalIntent(scoredIntents.length === 0
-        ? 'No intent rules matched any activity.'
-        : 'Matched rules did not reach sufficient confidence threshold.')
-    );
-  }
+  const hasUsableIntent = scoredIntents.length > 0 && scoredIntents[0].confidence >= 0.25;
+  const predictedIntents = hasUsableIntent
+    ? scoredIntents
+    : [createLowSignalIntent(scoredIntents.length === 0
+      ? 'No intent rules matched any approved activity.'
+      : 'Matched rules did not reach sufficient confidence threshold.')];
 
   const result = {
     schema_version: INTENT_SCHEMA_VERSION,
-    generated_at: new Date().toISOString(),
+    generated_at: options.generatedAt || new Date(resolveNow(options)).toISOString(),
     source: {
       activity_count: activities.length,
-      evidence_count: scoredIntents.reduce((sum, i) => sum + (i.evidence ? i.evidence.length : 0), 0),
+      approved_activity_count: safeActivities.length,
+      skipped_sensitive_activity_count: activities.length - safeActivities.length,
+      evidence_count: predictedIntents.reduce((sum, i) => sum + (i.evidence ? i.evidence.length : 0), 0),
       input_schema: inputSchema
     },
-    predicted_intents: scoredIntents,
+    predicted_intents: predictedIntents,
     unresolved_signals: sensitiveSignals,
     safety: createSafetyObject()
   };

@@ -1,7 +1,7 @@
 {
   "name": "memact-intent",
   "version": "0.1.0",
-  "description": "Evidence-backed user intent prediction from approved digital activity",
+  "description": "Permissioned intent prediction from approved digital activity",
   "type": "module",
   "scripts": {
     "intent": "node src/cli.mjs",

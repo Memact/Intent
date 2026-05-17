@@ -8,22 +8,40 @@ export const SENSITIVE_KEYWORDS = [
   'pregnant', 'abortion', 'contraceptive', 'fertility'
 ];
 
+function sensitiveSearchText(activity) {
+  return [activity.label, activity.text, activity.url]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+function findSensitiveKeyword(activity) {
+  const text = sensitiveSearchText(activity);
+  return SENSITIVE_KEYWORDS.find(keyword => text.includes(keyword.toLowerCase())) || null;
+}
+
+export function isSensitiveActivity(activity) {
+  return Boolean(findSensitiveKeyword(activity));
+}
+
 export function findSensitiveSignals(activities) {
   const found = [];
-  const lowerKeywords = SENSITIVE_KEYWORDS.map(k => k.toLowerCase());
-  for (const activity of activities) {
-    const text = `${activity.label} ${activity.text} ${activity.url}`.toLowerCase();
-    for (let i = 0; i < lowerKeywords.length; i++) {
-      if (text.includes(lowerKeywords[i])) {
-        found.push({
-          type: 'sensitive_signal_skipped',
-          reason: 'Sensitive content was not used for intent prediction.',
-          keyword: SENSITIVE_KEYWORDS[i]
-        });
-        break;
-      }
+
+  for (let index = 0; index < activities.length; index++) {
+    const activity = activities[index];
+    const keyword = findSensitiveKeyword(activity);
+
+    if (keyword) {
+      found.push({
+        type: 'sensitive_signal_skipped',
+        reason: 'Sensitive content was not used for intent prediction.',
+        keyword,
+        source_id: activity.id || `activity:${index}`,
+        activity_label: activity.label || ''
+      });
     }
   }
+
   return found;
 }
 

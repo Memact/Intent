@@ -8,21 +8,46 @@ Understand what users are trying to do.
 
 ## Overview
 
-Memact Intent is a deterministic, rule-based engine for turning approved digital activity into intent hypotheses.
+Memact Intent is a deterministic, rule-based engine for turning approved digital
+activity into intent hypotheses.
 
-Each prediction carries the evidence behind it: matched rules, supporting activity, alternative intents, safe next actions, and blocked actions. Apps get a narrow intent signal instead of raw private data.
+Each prediction carries the evidence behind it: matched rules, supporting
+activity, alternative intents, safe next actions, and blocked actions. Apps get
+a narrow intent signal instead of raw private data.
 
-Intent predictions are hypotheses, not facts. They are meant to guide user-confirmed actions, not replace user choice.
+Intent predictions are hypotheses, not facts. They are meant to guide
+user-confirmed actions, not replace user choice.
 
 ## How it fits into Memact
 
 ```text
-Access → Capture → Inference → Schema → Memory → Intent
+Website manages -> Access gates -> Capture records -> Inference understands -> Schema groups -> Intent predicts -> Memory stores -> Apps consume
 ```
 
-Access checks app permission, consent, scopes, and categories. Capture records approved evidence locally. Inference keeps meaningful activity. Schema groups repeated patterns. Memory stores what survives. Intent predicts what the user is likely trying to do from approved evidence.
+Access checks app permission, consent, scopes, and categories. Capture records
+approved evidence locally. Inference turns that evidence into semantic records.
+Schema groups repeated patterns. Intent predicts what the user is likely trying
+to do from recent semantic evidence, schema packets, recent approved activity,
+and optional memory context. Memory stores the final intent result.
 
-Intent can consume Capture events, Inference records, Schema packets, Memory-shaped activity, or simple activity arrays. Sensitive activity is skipped before scoring.
+Intent can consume Inference records, Schema packets, recent approved activity,
+optional Memory context, or simple activity arrays. Sensitive activity is
+skipped before scoring.
+
+## What This Repo Owns
+
+- `memact.intent.v0` intent hypotheses.
+- Evidence, confidence, alternatives, allowed actions, and blocked actions.
+- Sensitive-signal skipping before scoring.
+- Deterministic rule-based v0 prediction.
+
+## What This Repo Does Not Own
+
+- Browser/page capture.
+- Semantic evidence extraction.
+- Schema formation.
+- Durable memory writes.
+- Permission or consent verification.
 
 ## Install
 
@@ -132,36 +157,39 @@ npm run check
 
 ## Design choices
 
-The first version uses deterministic rules because intent infrastructure needs clear evidence trails.
+The first version uses deterministic rules because intent infrastructure needs
+clear evidence trails.
 
-- **Auditability** — every prediction traces back to rules and evidence.
-- **Privacy** — scoring runs locally without sending activity to external APIs.
-- **Predictability** — the same input can produce the same output when a fixed `now` value is provided.
-- **Small surface area** — the engine stays easy to review, test, and extend.
+- **Auditability** - every prediction traces back to rules and evidence.
+- **Privacy** - scoring runs locally without sending activity to external APIs.
+- **Predictability** - the same input can produce the same output when a fixed `now` value is provided.
+- **Small surface area** - the engine stays easy to review, test, and extend.
 
-Optional model-based scoring can be added later as a secondary signal. The core engine should stay auditable.
+Optional model-based scoring can be added later as a secondary signal. The core
+engine should stay auditable.
 
 ## Future extension points
 
-- Additional intent rules via plugins or configuration
-- Optional model-based scoring as a secondary signal
-- Time-window analysis for session-level intent
-- Cross-session pattern detection
-- User feedback loop for confidence calibration
+- Additional intent rules via plugins or configuration.
+- Optional model-based scoring as a secondary signal.
+- Time-window analysis for session-level intent.
+- Cross-session pattern detection.
+- User feedback loop for confidence calibration.
+- Reading prior Memory context before prediction while leaving durable writes to Memory.
 
 ## Project structure
 
 ```text
 Intent/
-├── README.md
-├── package.json
-├── src/
-│   ├── cli.mjs          # Command-line interface
-│   ├── engine.mjs       # Core prediction engine
-│   ├── intent-rules.mjs # Intent rules and sensitive signal detection
-│   ├── schema.mjs       # Data normalization, safety, confidence utilities
-│   └── format.mjs       # Human-readable report formatter
-├── samples/             # Example activity inputs
-└── test/
-    └── intent.test.mjs  # Test suite (Node.js built-in test runner)
+|-- README.md
+|-- package.json
+|-- src/
+|   |-- cli.mjs          # Command-line interface
+|   |-- engine.mjs       # Core prediction engine
+|   |-- intent-rules.mjs # Intent rules and sensitive signal detection
+|   |-- schema.mjs       # Data normalization, safety, confidence utilities
+|   `-- format.mjs       # Human-readable report formatter
+|-- samples/             # Example activity inputs
+`-- test/
+    `-- intent.test.mjs  # Test suite (Node.js built-in test runner)
 ```
